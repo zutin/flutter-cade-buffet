@@ -74,6 +74,38 @@ class Buffet {
   }
 }
 
+// COMPONENTS
+
+class BuffetCard extends StatelessWidget {
+  const BuffetCard({super.key, required this.buffet});
+  final Buffet buffet;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+        clipBehavior: Clip.hardEdge,
+        child: InkWell(
+          splashColor: Colors.deepPurple.withAlpha(90),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => BuffetDetailScreen(buffet: buffet),
+              ),
+            );
+          },
+          child: SizedBox(
+            width: 150,
+            height: 100,
+            child: Center(
+              child: Text(buffet.trading_name),
+            ),
+          ),
+        ),
+      );
+  }
+}
+
 // PAGES CLASSES
 
 class HomePage extends StatefulWidget {
@@ -98,16 +130,20 @@ class _HomePageState extends State<HomePage> {
       future: buffets,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return ListView.builder(
-            itemCount: snapshot.data!.length,
-            itemBuilder: (context, index) {
-              return ListTile(
-                title: Text(snapshot.data![index].trading_name),
-              );
-            },
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Wrap(
+                spacing: 8.0,
+                runSpacing: 8.0,
+                children: snapshot.data!.map((buffet) {
+                  return BuffetCard(buffet: buffet);
+                }).toList(),
+              ),
+            ),
           );
         } else if (snapshot.hasError) {
-          return Text('${snapshot.error}');
+          return const Text('Sem conexão com o serviço de buffets.');
         }
 
         return const CircularProgressIndicator();
@@ -131,6 +167,104 @@ class AboutPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Text('About');
+  }
+}
+
+class BuffetDetailScreen extends StatelessWidget {
+  const BuffetDetailScreen({super.key, required this.buffet});
+
+  final Buffet buffet;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Visualizando ${buffet.trading_name}"),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8),
+        child: ListView(
+          children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Center(
+                  child: Text(buffet.description, style: const TextStyle(fontSize: 16)),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        const Text('Telefone de contato:', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(buffet.contact_number),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const Text('E-mail:', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(buffet.email),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const Text('Endereço:', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(buffet.address),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const Text('Bairro:', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(buffet.district),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const Text('Cidade:', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text("${buffet.city} - ${buffet.state}"),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const Text('CEP:', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(buffet.zipcode),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const Text('Métodos de pagamento:', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(buffet.payment_methods),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ]
+        ),
+      ),
+    );
   }
 }
 
